@@ -1,6 +1,6 @@
 import struct
 
-from cStringIO import StringIO
+from io import BytesIO
 
 from django.core.files.base import ContentFile
 
@@ -54,7 +54,7 @@ class BaseRenderer(object):
         """Returns image data as a ``ContentFile``.
         """
 
-        io = StringIO()
+        io = BytesIO()
         content.save(io, self._normalize_format(), quality=self.quality)
         return ContentFile(io.getvalue())
 
