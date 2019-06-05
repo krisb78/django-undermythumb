@@ -58,6 +58,7 @@ class FallbackFieldDescriptor(ImageFileDescriptor):
                                ThumbnailFieldFile,
                                ImageWithThumbnailsFieldFile,
                                ImageFallbackField))
+            and value
             and hasattr(value, 'url')):
             value._empty = False
             return value
