@@ -1,4 +1,5 @@
 from hashlib import sha1
+import io
 import os
 
 from django.db.models.fields.files import ImageFieldFile
@@ -54,7 +55,7 @@ class ThumbnailSet(object):
 
     def __iter__(self):
         self._populate()
-        for attname, value in self._cache.iteritems():
+        for attname, value in self._cache.items():
             yield value
 
 
@@ -80,13 +81,18 @@ class ImageWithThumbnailsFieldFile(ImageFieldFile):
     def save(self, name, content, save=True):
         # set file name to first 8 chars of hash of contents
         _, ext = os.path.splitext(name)
-        file_hash = sha1(content.read()).hexdigest()[:8]
+
+        content_bytes = content.read()
+
+        file_hash = sha1(content_bytes).hexdigest()[:8]
         name = file_hash + ext
 
         # save source file
         super(ImageWithThumbnailsFieldFile, self).save(name, content, save)
 
         self.thumbnails.clear_cache()
+
+        content = io.BytesIO(content_bytes)
 
         for thumbnail in self.thumbnails:
             rendered = thumbnail.renderer.generate(content)
